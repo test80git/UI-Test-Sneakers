@@ -2,6 +2,8 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version "$springBootVersion"
     id 'io.spring.dependency-management' version "$springDependencyManagementVersion"
+    id 'io.qameta.allure' version "$allurePlugin"
+
 }
 
 group = 'ru.kuz'
@@ -11,6 +13,16 @@ description = 'UITestSneakerStore'
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+
+allure {
+    version = "$allureVersion"
+    autoconfigure = true
+    aspectjweaver = true
+    useJUnit5 {
+        version = "$allureVersion"
     }
 }
 
@@ -56,6 +68,10 @@ dependencies {
     // Исключаем logback, если он тянется через другие зависимости
     testRuntimeOnly 'org.slf4j:slf4j-simple:2.0.12'
 
+    // Allure
+    testImplementation "io.qameta.allure:allure-junit5:$allureVersion"
+    testImplementation "io.qameta.allure:allure-selenide:$allureVersion"
+    testImplementation("io.qameta.allure:allure-attachments:$allureVersion")
 }
 
 configurations.all {
@@ -69,4 +85,8 @@ tasks.named('test') {
 
     // Игнорировать CDP предупреждения
     systemProperty 'selenide.ignore.cdp.warnings', 'true'
+    systemProperties = [
+            'allure.results.directory': 'build/allure-results'
+    ]
+    finalizedBy 'allureReport'
 }
