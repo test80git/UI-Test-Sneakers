@@ -1,4 +1,6 @@
 package ru.sneakerstore.pages;
+import com.codeborne.selenide.WebDriverRunner;
+
 import static com.codeborne.selenide.Selenide.*;
 
 public abstract class BasePage {
@@ -7,7 +9,9 @@ public abstract class BasePage {
         open(url);
     }
 
-    protected void waitForLoad() {
-        sleep(1000); // временно
+    protected void waitForLoad(Long sleepMS) {
+        sleep(sleepMS); // временно
     }
+
+
 }

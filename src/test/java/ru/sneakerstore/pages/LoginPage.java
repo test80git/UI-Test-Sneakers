@@ -30,7 +30,7 @@ public class LoginPage extends BasePage {
 
     public LoginPage selectUser(String username) {
         userCard.findBy(text(username)).click();
-        waitForLoad();
+        waitForLoad(1000L);
         return this;
     }
 
