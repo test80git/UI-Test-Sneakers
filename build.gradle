@@ -83,10 +83,22 @@ configurations.all {
 tasks.named('test') {
     useJUnitPlatform()
 
+    // Очищаем allure-results перед тестами
+    doFirst {
+        delete 'build/allure-results'
+    }
+
     // Игнорировать CDP предупреждения
     systemProperty 'selenide.ignore.cdp.warnings', 'true'
     systemProperties = [
             'allure.results.directory': 'build/allure-results'
     ]
     finalizedBy 'allureReport'
+}
+
+// Очищаем перед генерацией отчета
+tasks.named('allureReport') {
+    doFirst {
+        delete 'build/reports/allure-report'
+    }
 }

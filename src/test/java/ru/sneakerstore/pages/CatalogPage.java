@@ -1,23 +1,16 @@
 package ru.sneakerstore.pages;
 
-import com.codeborne.selenide.Condition;
 import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.By;
 
-import java.time.Duration;
-import java.util.regex.Pattern;
-
-import static com.codeborne.selenide.Condition.hidden;
 import static com.codeborne.selenide.Condition.text;
 import static com.codeborne.selenide.Condition.visible;
 import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.$$;
 import static com.codeborne.selenide.Selenide.$$x;
 import static com.codeborne.selenide.Selenide.confirm;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 @Slf4j
@@ -80,7 +73,7 @@ public class CatalogPage extends BasePage {
         return this;
     }
 
-    public CatalogPage addToCart(int quantity) {
+    public String addToCart(int quantity) {
         log.info("Adding {} items to cart", quantity);
         // Устанавливаем количество (если нужно больше 1)
         String value = quantityValue.getValue();
@@ -88,25 +81,22 @@ public class CatalogPage extends BasePage {
         if (value.contains("1") && quantity > 1) {
             setQuantity(quantity);
         }
-        if(Integer.parseInt(value) > quantity) {
+        if (Integer.parseInt(value) > quantity) {
             setMinusQuantity(Integer.parseInt(value) - quantity);
         }
         // Нажимаем "Добавить в корзину"
         addToCartBtn.shouldBe(visible).click();
         // Обработка алерта
-        String alertText = confirm();
-        assertEquals("Товар добавлен в корзину!", alertText);
-
-        return this;
+        return confirm();
     }
 
     private void setMinusQuantity(int i) {
-       for (int index = 0; index < i; index++) {
-           quantityMinus.shouldBe(visible).click();
-       }
+        for (int index = 0; index < i; index++) {
+            quantityMinus.shouldBe(visible).click();
+        }
     }
 
-    public CatalogPage addToCartNotEnoughProduct(int quantity) {
+    public String addToCartNotEnoughProduct(int quantity) {
         log.info("Adding {} items to cart", quantity);
         // Устанавливаем количество (если нужно больше 1)
         if (quantity > 1) {
@@ -115,9 +105,8 @@ public class CatalogPage extends BasePage {
         // Нажимаем "Добавить в корзину"
         addToCartBtn.shouldBe(visible).click();
         // Обработка алерта
-        String alertText = confirm();
-        assertTrue(alertText.contains("Недостаточно товара"));
-        return this;
+        return confirm();
+
     }
 
     private void waitForModalToAppear() {

@@ -15,6 +15,7 @@ import ru.sneakerstore.pages.PaymentPage;
 import ru.sneakerstore.pages.PaymentSuccessPage;
 
 import static com.codeborne.selenide.Selenide.open;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @DisplayName("Сквозные сценарии пользователя")
@@ -39,34 +40,6 @@ public class UserJourneyTest extends BaseSelenideTest {
     }
 
     @Test
-    @Order(1)
-    @DisplayName("Проверка Недостаточно товара")
-    void happyPathCompletePurchase() {
-        // 1. Логин с выбором скидки
-        loginPage.selectUser("AdaLovelace")
-                .enableQuantityDiscount()
-                .login("AdaLovelace", "password");
-
-        // 2. Выбор товара
-        catalogPage.selectSneaker("New Balance 574")
-                .chooseSize(40)
-                .addToCartNotEnoughProduct(4)
-                .addToCart(3);
-
-        navBarPage.openCart();
-
-        // 3. Переход в корзину
-        cartPage.proceedToCheckout();
-
-        // 4. Оплата
-        paymentPage.verifyOrderDiscount().
-                verifyOrderTotal().
-                enterCardDetails("4111111111111111", "12/28", "IVAN PETROV", "123")
-                .pay();
-
-    }
-
-    @Test
     @Order(2)
     @DisplayName("Покупка трех товаров со скидкой для количества")
     void happyPathQualityPurchase() {
@@ -77,9 +50,10 @@ public class UserJourneyTest extends BaseSelenideTest {
                 .login("FedyaMel", "password");
 
         // 2. Выбор товара
-        catalogPage.selectSneaker("Nike Air Zoom Alphafly Next% 3")
+        String alertText =catalogPage.selectSneaker("Nike Air Zoom Alphafly Next% 3")
                 .chooseSize(37)
                 .addToCart(3);
+        assertTrue(alertText.contains("Товар добавлен в корзину!"));
 
         navBarPage.openCart();
 
@@ -94,7 +68,8 @@ public class UserJourneyTest extends BaseSelenideTest {
                 verifyOrderTotal().
                 enterCardDetails("4111111111111111", "12/28", "IVAN PETROV", "123")
                 .pay();
-
+        paymentSuccessPage.verifyHeading()
+                .verifyOrderIdContains("Заказ №");
     }
 
     @Test
@@ -108,9 +83,11 @@ public class UserJourneyTest extends BaseSelenideTest {
                 .login("FedyaMel", "password");
 
         // 2. Выбор товара
-        catalogPage.selectSneaker("беговые Adidas Ultraboost 22")
+       String alertText = catalogPage.selectSneaker("беговые Adidas Ultraboost 22")
                 .chooseSize(42)
                 .addToCart(2);
+
+        assertTrue(alertText.contains("Товар добавлен в корзину!"));
 
         navBarPage.openCart();
 
@@ -126,12 +103,13 @@ public class UserJourneyTest extends BaseSelenideTest {
                 verifyOrderTotal().
                 enterCardDetails("4111111111111111", "12/28", "IVAN PETROV", "123")
                 .pay();
-
+        paymentSuccessPage.verifyHeading()
+                .verifyOrderIdContains("Заказ №");
     }
 
     @Test
     @Order(4)
-    @DisplayName("Покупка двух товаров со скидкой для суммы больше 20000 руб")
+    @DisplayName("Покупка двух товаров со скидкой для суммы больше 20000 руб и количества больше 3")
     void happyPathSumAndQualityPurchase() {
         // 1. Логин с выбором скидки
         loginPage.selectUser("FedyaMel")
@@ -140,9 +118,11 @@ public class UserJourneyTest extends BaseSelenideTest {
                 .login("FedyaMel", "password");
 
         // 2. Выбор товара
-        catalogPage.selectSneaker("беговые Adidas Ultraboost 22")
+       String alertText = catalogPage.selectSneaker("беговые Adidas Ultraboost 22")
                 .chooseSize(43)
                 .addToCart(3);
+
+        assertTrue(alertText.contains("Товар добавлен в корзину!"));
 
         navBarPage.openCart();
 
@@ -158,6 +138,8 @@ public class UserJourneyTest extends BaseSelenideTest {
                 verifyOrderTotal().
                 enterCardDetails("4111111111111111", "12/28", "IVAN PETROV", "123")
                 .pay();
+        paymentSuccessPage.verifyHeading()
+                .verifyOrderIdContains("Заказ №");
 
     }
 
@@ -171,9 +153,11 @@ public class UserJourneyTest extends BaseSelenideTest {
                 .login("AdaLovelace", "password");
 
         // 2. Выбор товара
-        catalogPage.selectSneaker("New Balance 574")
+      String alertText =  catalogPage.selectSneaker("New Balance 574")
                 .chooseSize(41)
                 .addToCart(1);
+
+        assertTrue(alertText.contains("Товар добавлен в корзину!"));
 
         navBarPage.openCart();
 
@@ -212,10 +196,48 @@ public class UserJourneyTest extends BaseSelenideTest {
     }
 
     @Test
+    @Order(1)
+    @DisplayName("Проверка Недостаточно товара")
+    void happyPathCompletePurchase() {
+        // 1. Логин с выбором скидки
+        loginPage.selectUser("AdaLovelace")
+                .enableQuantityDiscount()
+                .login("AdaLovelace", "password");
+
+        // 2. Выбор товара
+        String alertText =   catalogPage.selectSneaker("New Balance 574")
+                .chooseSize(40)
+                .addToCartNotEnoughProduct(4);
+        assertTrue(alertText.contains("Недостаточно товара"));
+    }
+
+
+    @Test
     @Order(10)
     @DisplayName("Сценарий: отмена заказа после оформления")
     void cancelOrderAfterCreation() {
-        // похожий сценарий
+        // 1. Логин с выбором скидки
+        loginPage.selectUser("AdaLovelace")
+                .enableQuantityDiscount()
+                .login("AdaLovelace", "password");
+
+        // 2. Выбор товара
+        String alertText =  catalogPage.selectSneaker("New Balance 574")
+                .chooseSize(41)
+                .addToCart(1);
+
+        assertTrue(alertText.contains("Товар добавлен в корзину!"));
+
+        navBarPage.openCart();
+
+        // 3. Переход в корзину
+        cartPage.proceedToCheckout();
+
+        // 4. Оплата
+        paymentPage.verifyOrderDiscount().
+                verifyOrderTotal().
+                returnToCartPage();
+
     }
 
 

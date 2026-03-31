@@ -4,8 +4,13 @@ import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.Selenide;
 import com.codeborne.selenide.SelenideElement;
 import com.codeborne.selenide.WebDriverRunner;
+import io.qameta.allure.Allure;
+import io.qameta.allure.Attachment;
+import io.qameta.allure.Step;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
 
 import java.time.Duration;
 
@@ -35,6 +40,7 @@ public class PaymentPage extends BasePage {
 
     private ElementsCollection errorMessage = $$x("//div[@class='error-message']");
 
+    @Step("Поиск ошибки: {message}")
     public PaymentPage findError (String message) {
         SelenideElement selenideElement = errorMessage.find(text(message));
        Assertions.assertThat(selenideElement.getText()).isEqualTo(message);
@@ -67,11 +73,13 @@ public class PaymentPage extends BasePage {
         Assertions.assertThat(!value.isEmpty());
     }
 
+    @Step("Оплата заказа")
     public PaymentPage pay() {
         payBtn.scrollTo().shouldBe(visible).click();
         return this;
     }
 
+    @Step("Ввод деталей карты")
     public PaymentPage enterCardDetails(String numberCart,
                                         String expiryDate,
                                         String cardHolder,
@@ -82,15 +90,23 @@ public class PaymentPage extends BasePage {
                 setCVV(cvv);
     }
 
+    @Step("Проверка общей суммы заказа")
     public PaymentPage verifyOrderTotal() {
         log.info("Verify order total: {}", orderTotal.getText());
         return this;
     }
 
+    @Step("Проверка скидки в заказе")
     public PaymentPage verifyOrderDiscount() {
         log.info("Verify order discount: {}", orderDiscount.getText());
 //        orderDiscount.getValue().isEmpty();
         return this;
+    }
+
+    @Step("Вернуться на страницу корзины")
+    public void returnToCartPage() {
+        log.info("Return to cart page");
+        returnCart.click();
     }
 
 }
