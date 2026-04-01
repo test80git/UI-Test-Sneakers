@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Shop - Магазин кроссовок</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        /* Навигация */
+        .navbar {
+            background: #2c3e50;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .logo {
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-btn {
+            background: #34495e;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .nav-btn:hover {
+            background: #3498db;
+            transform: translateY(-2px);
+        }
+
+        #cartLink {
+            background: #e67e22;
+        }
+
+        #cartLink:hover {
+            background: #f39c12;
+        }
+
+        /* Контекстное меню */
+        .context-menu-area {
+            background: #f8f9fa;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            text-align: center;
+            cursor: context-menu;
+            border: 2px dashed #3498db;
+        }
+
+        .context-menu-area:hover {
+            background: #e3f2fd;
+        }
+
+        /* Контент */
+        .content {
+            padding: 30px;
+        }
+
+        /* Форма логина */
+        .login-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .login-section h3 {
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+
+        .user-cards {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .user-card {
+            background: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            border: 2px solid #ddd;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .user-card:hover {
+            border-color: #3498db;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .user-card.selected {
+            border-color: #27ae60;
+            background: #e8f5e9;
+        }
+
+        .discount-options {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .discount-options label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .login-form {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .login-form input {
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .login-form button {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        /* Выпадающий список */
+        .dropdown-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .dropdown-section select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        /* Каталог товаров */
+        .catalog-section {
+            margin-bottom: 30px;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .product-card {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .product-card.highlight {
+            background: #fff3cd;
+            border-color: #ffc107;
+        }
+
+        .product-card.discount {
+            background: #d4edda;
+            border-color: #28a745;
+        }
+
+        .product-image {
+            height: 200px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 48px;
+        }
+
+        .product-info {
+            padding: 15px;
+        }
+
+        .product-name {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .product-price {
+            color: #e67e22;
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .product-tag {
+            display: inline-block;
+            padding: 2px 8px;
+            background: #3498db;
+            color: white;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .select-size-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        /* Модальное окно */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            width: 90%;
+            max-width: 400px;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .sizes {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+
+        .size-btn {
+            width: 50px;
+            height: 50px;
+            border: 2px solid #ddd;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .size-btn:hover:not(.out-of-stock) {
+            border-color: #3498db;
+            background: #e3f2fd;
+        }
+
+        .size-btn.selected {
+            background: #3498db;
+            color: white;
+            border-color: #3498db;
+        }
+
+        .size-btn.out-of-stock {
+            background: #f0f0f0;
+            color: #999;
+            cursor: not-allowed;
+            text-decoration: line-through;
+        }
+
+        .quantity-control {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .quantity-btn {
+            width: 35px;
+            height: 35px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        #modalQuantity {
+            width: 60px;
+            text-align: center;
+            font-size: 16px;
+            padding: 5px;
+        }
+
+        .add-to-cart-btn {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            width: 100%;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        /* Корзина */
+        .cart-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 30px;
+        }
+
+        .cart-items {
+            margin-bottom: 20px;
+        }
+
+        .cart-item {
+            background: white;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .cart-summary {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .summary-row.total {
+            font-weight: bold;
+            font-size: 18px;
+            border-bottom: none;
+            margin-top: 10px;
+        }
+
+        #checkoutBtn {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+            font-size: 16px;
+        }
+
+        /* Сообщения */
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        .context-result {
+            margin-top: 10px;
+            padding: 10px;
+            background: #e8f5e9;
+            border-radius: 5px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- Навигация -->
+    <div class="navbar">
+        <div class="logo">👟 SneakerStore</div>
+        <div class="nav-links">
+            <button class="nav-btn" id="catalogLink">📦 Каталог</button>
+            <button class="nav-btn" id="cartLink">🛒 Корзина (<span id="cartCount">0</span>)</button>
+            <button class="nav-btn" id="switchUserBtn">👤 Сменить пользователя</button>
+            <button class="nav-btn" id="logoutBtn">🚪 Выйти</button>
+        </div>
+        <div id="userDisplay" style="color: white;"></div>
+    </div>
+
+    <div class="content">
+        <!-- Секция логина (изначально видна) -->
+        <div id="loginSection" class="login-section">
+            <h3>🔐 Авторизация</h3>
+            <div class="user-cards">
+                <div class="user-card" data-username="FedyaMel">
+                    <strong>FedyaMel</strong><br>
+                    <small>Скидки: количество + сумма</small>
+                </div>
+                <div class="user-card" data-username="AdaLovelace">
+                    <strong>AdaLovelace</strong><br>
+                    <small>Скидки: только количество</small>
+                </div>
+            </div>
+
+            <div class="discount-options">
+                <label>
+                    <input type="checkbox" id="discountQuantity"> 🎁 Скидка за количество (15%)
+                </label>
+                <label>
+                    <input type="checkbox" id="discountSum"> 💰 Скидка за сумму (10% при >20000)
+                </label>
+                <label>
+                    <input type="checkbox" id="discountPromo"> 🎫 Промокод
+                </label>
+                <input type="text" id="promoCode" placeholder="Промокод" style="width: 150px; display: none;">
+            </div>
+
+            <div class="login-form">
+                <input type="text" id="username" placeholder="Логин">
+                <input type="password" id="password" placeholder="Пароль">
+                <button type="submit" id="loginBtn">Войти</button>
+            </div>
+            <div id="loginError" class="error-message"></div>
+        </div>
+
+        <!-- Выпадающий список -->
+        <div id="dropdownSection" class="dropdown-section" style="display: none;">
+            <h3>📋 Сортировка товаров</h3>
+            <select id="sortSelect">
+                <option value="default">По умолчанию</option>
+                <option value="priceAsc">Цена: по возрастанию</option>
+                <option value="priceDesc">Цена: по убыванию</option>
+                <option value="nameAsc">Название: А-Я</option>
+                <option value="nameDesc">Название: Я-А</option>
+            </select>
+        </div>
+
+        <!-- Контекстное меню -->
+        <div id="contextMenuArea" class="context-menu-area" style="display: none;">
+            <p>📌 Область для правого клика (контекстное меню)</p>
+            <p><small>Кликните правой кнопкой мыши</small></p>
+            <div id="contextResult" class="context-result"></div>
+        </div>
+
+        <!-- Секция каталога (скрыта до логина) -->
+        <div id="catalogSection" style="display: none;">
+            <div class="catalog-section">
+                <h3>👟 Каталог кроссовок</h3>
+                <div class="products-grid" id="productsGrid"></div>
+            </div>
+        </div>
+
+        <!-- Секция корзины (скрыта) -->
+        <div id="cartSection" class="cart-section" style="display: none;">
+            <h3>🛒 Корзина</h3>
+            <div id="cartItems" class="cart-items"></div>
+            <div id="cartSummary" class="cart-summary">
+                <div class="summary-row">
+                    <span>Количество:</span>
+                    <span id="cartQuantity">0</span>
+                </div>
+                <div class="summary-row">
+                    <span>Сумма без скидки:</span>
+                    <span id="cartSubtotal">0</span>
+                </div>
+                <div class="summary-row">
+                    <span>Скидка:</span>
+                    <span id="cartDiscount">0</span>
+                </div>
+                <div class="summary-row total">
+                    <span>Итого к оплате:</span>
+                    <span id="cartTotal">0</span>
+                </div>
+            </div>
+            <button id="checkoutBtn">Перейти к оплате</button>
+        </div>
+
+        <!-- Секция оплаты (скрыта) -->
+        <div id="paymentSection" style="display: none;">
+            <div class="cart-section">
+                <h3>💳 Оплата заказа</h3>
+                <div id="orderItems"></div>
+                <div class="cart-summary" style="margin-top: 20px;">
+                    <div class="summary-row">
+                        <span>Скидка:</span>
+                        <span id="orderDiscount">0</span>
+                    </div>
+                    <div class="summary-row total">
+                        <span>Итого к оплате:</span>
+                        <span id="orderTotal">0</span>
+                    </div>
+                </div>
+
+                <form id="paymentForm" style="margin-top: 20px;">
+                    <div style="margin-bottom: 15px;">
+                        <label>Номер карты:</label>
+                        <input type="text" id="cardNumber" placeholder="4111111111111111" style="width: 100%; padding: 10px;">
+                    </div>
+                    <div style="margin-bottom: 15px;">
+                        <label>Срок действия:</label>
+                        <input type="text" id="expiryDate" placeholder="MM/YY" style="width: 100%; padding: 10px;">
+                    </div>
+                    <div style="margin-bottom: 15px;">
+                        <label>Владелец:</label>
+                        <input type="text" id="cardHolder" placeholder="IVAN PETROV" style="width: 100%; padding: 10px;">
+                    </div>
+                    <div style="margin-bottom: 15px;">
+                        <label>CVV:</label>
+                        <input type="text" id="cvv" placeholder="123" style="width: 100%; padding: 10px;">
+                    </div>
+                    <button type="button" id="payButton" style="background: #27ae60; color: white; border: none; padding: 12px; border-radius: 8px; width: 100%; cursor: pointer;">Оплатить</button>
+                    <button type="button" style="background: #95a5a6; color: white; border: none; padding: 12px; border-radius: 8px; width: 100%; cursor: pointer; margin-top: 10px;" onclick="showCart()">Вернуться в корзину</button>
+                </form>
+                <div id="paymentError" class="error-message"></div>
+            </div>
+        </div>
+
+        <!-- Секция успешной оплаты -->
+        <div id="successSection" class="cart-section" style="display: none; text-align: center;">
+            <div class="success" style="font-size: 48px;">✅</div>
+            <h2 class="success">Оплата прошла успешно!</h2>
+            <div class="order-info" id="orderInfo">Заказ №12345</div>
+            <div id="counter" style="margin-top: 20px; font-size: 14px; color: #7f8c8d;">Перенаправление через 5 сек...</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Данные товаров
+    const products = [
+        { id: 1, name: "беговые Adidas Ultraboost 22", price: 14500, sizes: { 40: 5, 41: 3, 42: 2, 43: 1, 44: 0 }, tag: "new" },
+        { id: 2, name: "Nike Air Zoom Alphafly Next% 3", price: 5800, sizes: { 37: 5, 38: 3, 39: 2, 40: 1 }, tag: "sale" },
+        { id: 3, name: "New Balance 574", price: 4200, sizes: { 40: 2, 41: 1, 42: 0 }, tag: "popular" },
+        { id: 4, name: "Puma RS-X", price: 8900, sizes: { 41: 3, 42: 2, 43: 1 }, tag: "new" },
+        { id: 5, name: "Reebok Classic", price: 6500, sizes: { 40: 4, 41: 2, 42: 1 }, tag: "sale" }
+    ];
+
+    let currentUser = null;
+    let cart = [];
+    let selectedProduct = null;
+    let selectedSize = null;
+    let discounts = { quantity: false, sum: false, promo: false };
+
+    // Функции скидок
+    function calculateDiscount(subtotal, quantity) {
+        let discount = 0;
+        if (discounts.quantity && quantity >= 3) discount = Math.max(discount, 15);
+        if (discounts.sum && subtotal >= 20000) discount = Math.max(discount, 10);
+        if (discounts.promo && document.getElementById('promoCode').value === 'SAVE20') discount = Math.max(discount, 20);
+        return discount;
+    }
+
+    function updateCartDisplay() {
+        const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        const totalQuantity = cart.reduce((sum, item) => sum + item.quantity, 0);
+        const discountPercent = calculateDiscount(subtotal, totalQuantity);
+        const discountAmount = Math.floor(subtotal * discountPercent / 100);
+        const total = subtotal - discountAmount;
+
+        document.getElementById('cartQuantity').innerText = totalQuantity;
+        document.getElementById('cartSubtotal').innerText = subtotal;
+        document.getElementById('cartDiscount').innerText = discountAmount;
+        document.getElementById('cartTotal').innerText = total;
+        document.getElementById('cartCount').innerText = totalQuantity;
+
+        const cartItemsDiv = document.getElementById('cartItems');
+        cartItemsDiv.innerHTML = cart.map(item => `
+                <div class="cart-item">
+                    <span>${item.name} (${item.size}) x${item.quantity}</span>
+                    <span>${item.price * item.quantity} ₽</span>
+                </div>
+            `).join('');
+    }
+
+    function renderCatalog() {
+        const grid = document.getElementById('productsGrid');
+        grid.innerHTML = products.map(p => `
+                <div class="product-card ${p.tag}" data-product='${JSON.stringify(p)}' data-price="${p.price}" data-name="${p.name}">
+                    <div class="product-image">👟</div>
+                    <div class="product-info">
+                        <div class="product-name">${p.name}</div>
+                        <div class="product-price">${p.price} ₽</div>
+                        <span class="product-tag">${p.tag}</span>
+                        <button class="select-size-btn" onclick='showModal(${JSON.stringify(p).replace(/'/g, "&apos;")})'>Выбрать размер</button>
+                    </div>
+                </div>
+            `).join('');
+    }
+
+    function sortProducts(criteria) {
+        let sorted = [...products];
+        switch(criteria) {
+            case 'priceAsc':
+                sorted.sort((a, b) => a.price - b.price);
+                break;
+            case 'priceDesc':
+                sorted.sort((a, b) => b.price - a.price);
+                break;
+            case 'nameAsc':
+                sorted.sort((a, b) => a.name.localeCompare(b.name));
+                break;
+            case 'nameDesc':
+                sorted.sort((a, b) => b.name.localeCompare(a.name));
+                break;
+        }
+        const grid = document.getElementById('productsGrid');
+        grid.innerHTML = sorted.map(p => `
+                <div class="product-card ${p.tag}" data-product='${JSON.stringify(p)}' data-price="${p.price}" data-name="${p.name}">
+                    <div class="product-image">👟</div>
+                    <div class="product-info">
+                        <div class="product-name">${p.name}</div>
+                        <div class="product-price">${p.price} ₽</div>
+                        <span class="product-tag">${p.tag}</span>
+                        <button class="select-size-btn" onclick='showModal(${JSON.stringify(p).replace(/'/g, "&apos;")})'>Выбрать размер</button>
+                    </div>
+                </div>
+            `).join('');
+    }
+
+    // Модальное окно
+    function showModal(product) {
+        selectedProduct = product;
+        selectedSize = null;
+        document.getElementById('modalProductName').innerText = product.name;
+        const sizesDiv = document.getElementById('modalSizes');
+        sizesDiv.innerHTML = '';
+        for (let [size, stock] of Object.entries(product.sizes)) {
+            const btn = document.createElement('button');
+            btn.className = 'size-btn' + (stock === 0 ? ' out-of-stock' : '');
+            btn.innerText = size;
+            if (stock > 0) {
+                btn.onclick = () => {
+                    document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('selected'));
+                    btn.classList.add('selected');
+                    selectedSize = parseInt(size);
+                };
+            }
+            sizesDiv.appendChild(btn);
+        }
+        document.getElementById('modalQuantity').value = 1;
+        document.getElementById('productModal').classList.add('active');
+    }
+
+    function addToCart() {
+        if (!selectedSize) {
+            alert('Выберите размер');
+            return;
+        }
+        const quantity = parseInt(document.getElementById('modalQuantity').value);
+        const stock = selectedProduct.sizes[selectedSize];
+        if (quantity > stock) {
+            alert('Недостаточно товара');
+            return;
+        }
+        const existing = cart.find(i => i.id === selectedProduct.id && i.size === selectedSize);
+        if (existing) {
+            existing.quantity += quantity;
+        } else {
+            cart.push({ ...selectedProduct, size: selectedSize, quantity });
+        }
+        selectedProduct.sizes[selectedSize] -= quantity;
+        updateCartDisplay();
+        document.getElementById('productModal').classList.remove('active');
+        alert('Товар добавлен в корзину!');
+    }
+
+    // Логин
+    document.getElementById('loginBtn').onclick = () => {
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        if (username === 'FedyaMel' && password === 'password') {
+            currentUser = 'FedyaMel';
+            discounts.quantity = document.getElementById('discountQuantity').checked;
+            discounts.sum = document.getElementById('discountSum').checked;
+            document.getElementById('userDisplay').innerHTML = `👤 ${username}`;
+            document.getElementById('loginSection').style.display = 'none';
+            document.getElementById('dropdownSection').style.display = 'block';
+            document.getElementById('contextMenuArea').style.display = 'block';
+            document.getElementById('catalogSection').style.display = 'block';
+            renderCatalog();
+        } else if (username === 'AdaLovelace' && password === 'password') {
+            currentUser = 'AdaLovelace';
+            discounts.quantity = true;
+            document.getElementById('userDisplay').innerHTML = `👤 ${username}`;
+            document.getElementById('loginSection').style.display = 'none';
+            document.getElementById('dropdownSection').style.display = 'block';
+            document.getElementById('contextMenuArea').style.display = 'block';
+            document.getElementById('catalogSection').style.display = 'block';
+            renderCatalog();
+        } else {
+            document.getElementById('loginError').innerText = 'Неверный логин или пароль';
+            document.getElementById('loginError').classList.add('show');
+            setTimeout(() => document.getElementById('loginError').classList.remove('show'), 3000);
+        }
+    };
+
+    // Сортировка
+    document.getElementById('sortSelect').onchange = (e) => {
+        sortProducts(e.target.value);
+    };
+
+    // Контекстное меню
+    document.getElementById('contextMenuArea').oncontextmenu = (e) => {
+        e.preventDefault();
+        const result = document.getElementById('contextResult');
+        result.style.display = 'block';
+        result.innerHTML = '✅ Правый клик сработал!';
+        setTimeout(() => {
+            result.style.display = 'none';
+        }, 2000);
+        return false;
+    };
+
+    // Промокод
+    document.getElementById('discountPromo').onchange = (e) => {
+        document.getElementById('promoCode').style.display = e.target.checked ? 'inline-block' : 'none';
+        discounts.promo = e.target.checked;
+    };
+
+    document.getElementById('promoCode').oninput = () => updateCartDisplay();
+
+    // Навигация
+    window.showCart = () => {
+        document.getElementById('catalogSection').style.display = 'none';
+        document.getElementById('cartSection').style.display = 'block';
+        document.getElementById('paymentSection').style.display = 'none';
+        updateCartDisplay();
+    };
+
+    document.getElementById('cartLink').onclick = showCart;
+    document.getElementById('catalogLink').onclick = () => {
+        document.getElementById('catalogSection').style.display = 'block';
+        document.getElementById('cartSection').style.display = 'none';
+        document.getElementById('paymentSection').style.display = 'none';
+    };
+
+    document.getElementById('checkoutBtn').onclick = () => {
+        document.getElementById('cartSection').style.display = 'none';
+        document.getElementById('paymentSection').style.display = 'block';
+        const total = document.getElementById('cartTotal').innerText;
+        const discount = document.getElementById('cartDiscount').innerText;
+        document.getElementById('orderTotal').innerText = total;
+        document.getElementById('orderDiscount').innerText = discount;
+    };
+
+    // Оплата
+    document.getElementById('payButton').onclick = () => {
+        const card = document.getElementById('cardNumber').value;
+        const expiry = document.getElementById('expiryDate').value;
+        const holder = document.getElementById('cardHolder').value;
+        const cvv = document.getElementById('cvv').value;
+
+        const errorDiv = document.getElementById('paymentError');
+
+        if (card === '0000000000000000') {
+            errorDiv.innerText = 'Карта заблокирована';
+            errorDiv.classList.add('show');
+            setTimeout(() => errorDiv.classList.remove('show'), 2000);
+            return;
+        }
+        if (card === '1234567890123456') {
+            errorDiv.innerText = 'Недостаточно средств';
+            errorDiv.classList.add('show');
+            setTimeout(() => errorDiv.classList.remove('show'), 2000);
+            return;
+        }
+        if (expiry === '12/24') {
+            errorDiv.innerText = 'Срок действия карты истёк';
+            errorDiv.classList.add('show');
+            setTimeout(() => errorDiv.classList.remove('show'), 2000);
+            return;
+        }
+        if (!/^\d{2}\/\d{2}$/.test(expiry)) {
+            errorDiv.innerText = 'Неверный формат. Используйте MM/YY';
+            errorDiv.classList.add('show');
+            setTimeout(() => errorDiv.classList.remove('show'), 2000);
+            return;
+        }
+        if (card.length < 16) {
+            errorDiv.innerText = 'Ошибка валидации входных данных';
+            errorDiv.classList.add('show');
+            setTimeout(() => errorDiv.classList.remove('show'), 2000);
+            return;
+        }
+
+        document.getElementById('paymentSection').style.display = 'none';
+        document.getElementById('successSection').style.display = 'block';
+        document.getElementById('orderInfo').innerText = `Заказ №${Math.floor(Math.random() * 100000)}`;
+
+        let counter = 5;
+        const timer = setInterval(() => {
+            counter--;
+            document.getElementById('counter').innerText = `Перенаправление через ${counter} сек...`;
+            if (counter <= 0) {
+                clearInterval(timer);
+                cart = [];
+                updateCartDisplay();
+                document.getElementById('successSection').style.display = 'none';
+                document.getElementById('catalogSection').style.display = 'block';
+            }
+        }, 1000);
+    };
+
+    // Модальное окно
+    const modalHtml = `
+            <div id="productModal" class="modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 id="modalProductName"></h3>
+                        <button class="close-modal" onclick="document.getElementById('productModal').classList.remove('active')">&times;</button>
+                    </div>
+                    <div id="modalSizes" class="sizes"></div>
+                    <div class="quantity-control">
+                        <button class="quantity-btn" onclick="const q=document.getElementById('modalQuantity'); q.value=Math.max(1,parseInt(q.value)-1)">-</button>
+                        <input type="number" id="modalQuantity" value="1" min="1">
+                        <button class="quantity-btn" onclick="const q=document.getElementById('modalQuantity'); q.value=parseInt(q.value)+1">+</button>
+                    </div>
+                    <button class="add-to-cart-btn" onclick="addToCart()">Добавить в корзину</button>
+                </div>
+            </div>
+        `;
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+</script>
+</body>
+</html>
