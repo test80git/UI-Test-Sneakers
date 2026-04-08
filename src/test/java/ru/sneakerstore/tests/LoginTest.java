@@ -7,6 +7,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import ru.sneakerstore.config.BaseSelenideTest;
 import ru.sneakerstore.pages.LoginPage;
 
+import static com.codeborne.selenide.Condition.text;
 import static com.codeborne.selenide.Condition.visible;
 import static com.codeborne.selenide.Selenide.*;
 import static org.assertj.core.api.Assertions.*;
@@ -20,6 +21,7 @@ public class LoginTest extends BaseSelenideTest {
     public void setUp() {
         loginPage = new LoginPage();
         open("/login.html");  // ← открываем страницу перед каждым тестом
+       pause(200);
     }
 
 
@@ -27,15 +29,20 @@ public class LoginTest extends BaseSelenideTest {
     @Order(1)
     @DisplayName("Успешный логин с валидными данными")
     void successfulLogin() {
-        loginPage.login("Andrey88", "password");
         // Проверяем, что перешли на главную
         assertThat(title()).isEqualTo("Вход в магазин кроссовок");
+
+        loginPage.login("Andrey88", "password");
+        $("h2").shouldHave(text("Sneaker Store"));
     }
 
     @Test
     @Order(10)
     @DisplayName("Ошибка при неверном пароле")
     void loginWithWrongPassword() {
+        // Проверяем, что перешли на главную
+        assertThat(title()).isEqualTo("Вход в магазин кроссовок");
+
         loginPage.login("Andrey88", "wrong");
 
         // Проверяем сообщение об ошибке

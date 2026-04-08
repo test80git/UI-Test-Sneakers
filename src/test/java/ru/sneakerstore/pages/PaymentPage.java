@@ -42,7 +42,7 @@ public class PaymentPage extends BasePage {
 
     @Step("Поиск ошибки: {message}")
     public PaymentPage findError (String message) {
-        SelenideElement selenideElement = errorMessage.find(text(message));
+        SelenideElement selenideElement = errorMessage.shouldHave().find(text(message));
        Assertions.assertThat(selenideElement.getText()).isEqualTo(message);
         return this;
     }

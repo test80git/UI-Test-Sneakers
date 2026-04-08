@@ -13,10 +13,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInfo;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
 
 abstract public class BaseSelenideTest {
+
+    private static final Logger log = LoggerFactory.getLogger(BaseSelenideTest.class);
 
     @BeforeAll
     static void setup() {
@@ -28,18 +32,15 @@ abstract public class BaseSelenideTest {
         );
     }
 
-    public void setUp() {
+    private void setUp() {
         WebDriverManager.chromedriver().setup();
-        Configuration.fastSetValue = false;
-        Configuration.headless = false;
-        Configuration.screenshots = true;
-        Configuration.savePageSource = true;
+        Configuration.fastSetValue = false; // Использовать реальный ввод (не JS)
     }
 
     @BeforeEach
     public void init(TestInfo testInfo) {
+        log.info("Running test: {}", testInfo.getDisplayName());
         setUp();
-
     }
 
     @AfterEach

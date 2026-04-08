@@ -5,6 +5,7 @@ import com.codeborne.selenide.SelenideElement;
 import org.junit.jupiter.api.Assertions;
 
 import static com.codeborne.selenide.Condition.text;
+import static com.codeborne.selenide.Condition.value;
 import static com.codeborne.selenide.Selenide.*;
 
 public class LoginPage extends BasePage {
@@ -23,8 +24,8 @@ public class LoginPage extends BasePage {
     private SelenideElement promoCodeField = $("#promoCode");
 
     public void login(String username, String password) {
-        usernameInput.setValue(username);
-        passwordInput.setValue(password);
+        usernameInput.setValue(username).shouldHave(value(username));
+        passwordInput.setValue(password).shouldHave(value(password));
         loginButton.click();
     }
 
