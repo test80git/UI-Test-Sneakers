@@ -83,6 +83,12 @@ configurations.all {
 tasks.named('test') {
     useJUnitPlatform()
 
+    testLogging {
+        events "passed", "skipped", "failed"
+        exceptionFormat "full"
+        showStandardStreams = true
+    }
+
     // Очищаем allure-results перед тестами
     doFirst {
         delete 'build/allure-results'
