@@ -80,6 +80,10 @@ configurations.all {
     exclude group: 'ch.qos.logback', module: 'logback-core'
 }
 
+
+def runId = System.getProperty('run.id', '1')
+def allureResultsDir = "build/allure-results-${runId}"
+
 tasks.named('test') {
     useJUnitPlatform()
 
@@ -91,15 +95,12 @@ tasks.named('test') {
 
     // Очищаем allure-results перед тестами
     doFirst {
-        delete 'build/allure-results'
-        delete 'build/failed-tests.txt'
+        delete allureResultsDir
     }
 
     // Игнорировать CDP предупреждения
     systemProperty 'selenide.ignore.cdp.warnings', 'true'
-    systemProperties = [
-            'allure.results.directory': 'build/allure-results'
-    ]
+    systemProperty 'allure.results.directory', allureResultsDir
     finalizedBy 'allureReport'
 }
 

@@ -21,25 +21,28 @@ pipeline {
 
         stage('First Run') {
             steps {
-                sh 'chmod +x gradlew'
-                catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-                                        sh './gradlew clean test'
-                                    }
+                script {
+                    sh 'chmod +x gradlew'
+                    catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+                        sh './gradlew clean test -Drun.id=1'
+                    }
+                }
             }
         }
+
         stage('Retry Failed') {
             steps {
                 script {
-                  def failedTestsFile = 'build/failed-tests.txt'
-                  if (fileExists(failedTestsFile)) {
-                      def failedTests = readFile(failedTestsFile).trim()
-                      if (failedTests) {
-                          sh 'chmod +x gradlew'
-                          catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-                                                          sh "./gradlew test ${failedTests}"
-                                                      }
-                      }
-                  }
+                    def failedTestsFile = 'build/failed-tests.txt'
+                    if (fileExists(failedTestsFile)) {
+                        def failedTests = readFile(failedTestsFile).trim()
+                        if (failedTests) {
+                            sh 'chmod +x gradlew'
+                            catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+                                sh "./gradlew test ${failedTests} -Drun.id=2"
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -50,7 +53,13 @@ pipeline {
         always {
             script {
                 if (params.GENERATE_ALLURE) {
-                    allure includeProperties: false, results: [[path: 'build/allure-results']]
+                 // Объединяем результаты из всех запусков
+                                sh '''
+                                    mkdir -p build/allure-results-final
+                                    cp -r build/allure-results-1/* build/allure-results-final/ 2>/dev/null || true
+                                    cp -r build/allure-results-2/* build/allure-results-final/ 2>/dev/null || true
+                                '''
+                    allure includeProperties: false, results: [[path: 'build/allure-results-final']]
                 }
                 archiveArtifacts artifacts: 'build/failed-tests.txt', allowEmptyArchive: true
             }
@@ -75,7 +84,7 @@ pipeline {
                         View build: ${env.BUILD_URL}
                         Allure report: ${env.BUILD_URL}allure/
                     """,
-                        to: 'smith80java@gmail.com',
+                        to: 'smith-m-80@mail.ru',
                         from: 'smith-m-80@mail.ru'
                 )
 
@@ -114,7 +123,7 @@ pipeline {
                         Check logs for details: ${env.BUILD_URL}
                         Allure report: ${env.BUILD_URL}allure/
                     """,
-                        to: 'smith80java@gmail.com',
+                        to: 'smith-m-80@mail.ru',
                         from: 'smith-m-80@mail.ru'
                 )
 
@@ -152,7 +161,7 @@ pipeline {
                         Check Allure report: ${env.BUILD_URL}allure/
                         View build: ${env.BUILD_URL}
                     """,
-                        to: 'smith80java@gmail.com',
+                        to: 'smith-m-80@mail.ru',
                         from: 'smith-m-80@mail.ru'
                 )
 
