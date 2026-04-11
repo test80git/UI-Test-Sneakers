@@ -11,15 +11,18 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInfo;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.CapabilityType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.sneakerstore.callback.SaverFailed;
 
 import java.io.ByteArrayInputStream;
 
+@ExtendWith(SaverFailed.class)
 abstract public class BaseSelenideTest {
 
     private static final Logger log = LoggerFactory.getLogger(BaseSelenideTest.class);
@@ -28,9 +31,8 @@ abstract public class BaseSelenideTest {
     static void setup() {
 
         // Настройки для CI/CD
-        Configuration.headless = true;
-        Configuration.browser = "chrome";
-
+//        Configuration.headless = true;
+//        Configuration.browser = "chrome";
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--no-sandbox");
         options.addArguments("--disable-dev-shm-usage");

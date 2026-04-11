@@ -92,6 +92,7 @@ tasks.named('test') {
     // Очищаем allure-results перед тестами
     doFirst {
         delete 'build/allure-results'
+        delete 'build/failed-tests.txt'
     }
 
     // Игнорировать CDP предупреждения
@@ -108,3 +109,25 @@ tasks.named('allureReport') {
         delete 'build/reports/allure-report'
     }
 }
+
+
+// // Перезапускает упавшие тесты один раз после основного запуска,
+// // но для Gradle task, так как у нас есть Jenkinsfile, то сейчас не нужен!
+// // Jenkins Pipeline — он будет управлять перезапусками.
+//task rerunFailedTests {
+//    doLast {
+//        def failedTestsFile = file('build/failed-tests.txt')
+//        if (failedTestsFile.exists()) {
+//            def failedTests = failedTestsFile.text.trim()
+//            if (failedTests) {
+//                println "Rerunning failed tests: ${failedTests}"
+//                exec {
+//                    commandLine './gradlew', 'test', *failedTests.split(' ')
+//                }
+//            }
+//        }
+//    }
+//}
+//
+//test.finalizedBy rerunFailedTests
+
