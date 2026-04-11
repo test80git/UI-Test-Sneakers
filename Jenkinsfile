@@ -10,6 +10,7 @@ pipeline {
     environment {
         TELEGRAM_TOKEN = credentials('TELEGRAM_TOKEN')
         TELEGRAM_CHAT_ID = credentials('TELEGRAM_CHAT_ID')
+        MAIL_PASSWORD = credentials('MAIL_PASSWORD')
     }
 
     stages {
@@ -47,6 +48,17 @@ pipeline {
             }
         }
 
+//         stage('Send Email') {
+//             steps {
+//                 withCredentials([string(credentialsId: 'MAIL_PASSWORD', variable: 'MAIL_PASSWORD')]) {
+//                     sh '''
+//                         chmod +x send_email.sh
+//                         ./send_email.sh "Test Subject" "Test Body"
+//                     '''
+//                 }
+//             }
+//         }
+
     }
 
     post {
@@ -68,25 +80,15 @@ pipeline {
         success {
             script {
                 def duration = currentBuild.durationString.replace(' and counting', '')
+                def subject = "SUCCESS: ${env.JOB_NAME} - Build #${env.BUILD_NUMBER}"
+                def body = "All tests passed successfully!"
+                def allureUrl = "${env.BUILD_URL}allure/"
 
                 // Email уведомление
-                emailext (
-                        subject: "✅ SUCCESS: ${env.JOB_NAME} - Build #${env.BUILD_NUMBER}",
-                        body: """
-                        Build completed successfully!
-                        
-                        Job: ${env.JOB_NAME}
-                        Build number: ${env.BUILD_NUMBER}
-                        Duration: ${duration}
-                        
-                        All tests passed!
-                        
-                        View build: ${env.BUILD_URL}
-                        Allure report: ${env.BUILD_URL}allure/
-                    """,
-                        to: 'smith-m-80@mail.ru',
-                        from: 'smith-m-80@mail.ru'
-                )
+                sh """
+                                 chmod +x send_email.sh
+                                 ./send_email.sh "${subject}" "${body}" "${allureUrl}"
+                             """
 
                 // Telegram уведомление
                 def telegramMsg = """
@@ -109,23 +111,14 @@ pipeline {
         failure {
             script {
                 def duration = currentBuild.durationString.replace(' and counting', '')
+                def subject = "❌ FAILED: ${env.JOB_NAME} - Build #${env.BUILD_NUMBER}"
+                def body = "Build failed! Check logs for details."
+                def allureUrl = "${env.BUILD_URL}allure/"
 
-                // Email уведомление
-                emailext (
-                        subject: "❌ FAILED: ${env.JOB_NAME} - Build #${env.BUILD_NUMBER}",
-                        body: """
-                        Build failed!
-                        
-                        Job: ${env.JOB_NAME}
-                        Build number: ${env.BUILD_NUMBER}
-                        Duration: ${duration}
-                        
-                        Check logs for details: ${env.BUILD_URL}
-                        Allure report: ${env.BUILD_URL}allure/
-                    """,
-                        to: 'smith-m-80@mail.ru',
-                        from: 'smith-m-80@mail.ru'
-                )
+              sh '''
+                                chmod +x send_email.sh
+                                ./send_email.sh "${subject}" "${body}" "${allureUrl}"
+                            '''
 
                 // Telegram уведомление
                 def telegramMsg = """
@@ -147,23 +140,14 @@ pipeline {
 
         unstable {
             script {
-                // Email уведомление для нестабильной сборки
-                emailext (
-                        subject: "⚠️ UNSTABLE: ${env.JOB_NAME} - Build #${env.BUILD_NUMBER}",
-                        body: """
-                        Tests are unstable!
-                        
-                        Job: ${env.JOB_NAME}
-                        Build number: ${env.BUILD_NUMBER}
-                        
-                        Some tests failed after ${params.MAX_RETRIES} attempts.
-                        
-                        Check Allure report: ${env.BUILD_URL}allure/
-                        View build: ${env.BUILD_URL}
-                    """,
-                        to: 'smith-m-80@mail.ru',
-                        from: 'smith-m-80@mail.ru'
-                )
+                def subject = "⚠️ UNSTABLE: ${env.JOB_NAME} - Build #${env.BUILD_NUMBER}"
+                def body = "Some tests failed after ${params.MAX_RETRIES} attempts. Check Allure report."
+                def allureUrl = "${env.BUILD_URL}allure/"
+
+                sh '''
+                    chmod +x send_email.sh
+                    ./send_email.sh "${subject}" "${body}" "${allureUrl}"
+                '''
 
                 // Telegram уведомление
                 def telegramMsg = "⚠️ *TESTS UNSTABLE* ⚠️\nJob: ${env.JOB_NAME}\nBuild: #${env.BUILD_NUMBER}\nSome tests failed after ${params.MAX_RETRIES} attempts.\n[View Logs](${env.BUILD_URL})"
