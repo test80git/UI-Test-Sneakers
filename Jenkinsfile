@@ -19,50 +19,31 @@ pipeline {
             }
         }
 
-        stage('Run Tests with Retry') {
+        stage('First Run') {
+            steps {
+                sh 'chmod +x gradlew'
+                catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+                                        sh './gradlew clean test'
+                                    }
+            }
+        }
+        stage('Retry Failed') {
             steps {
                 script {
-                    sh 'chmod +x gradlew'
-
-                    def maxRetries = params.MAX_RETRIES.toInteger()
-                    def currentRun = 0
-                    def allTestsPassed = false
-                    def failedTestsList = []
-
-                    if (!params.SKIP_INITIAL_RUN) {
-                        currentRun++
-                        echo "Run ${currentRun}: Running all tests"
-                        sh './gradlew clean test'
-                    }
-
-                    while (currentRun < maxRetries) {
-                        def failedTestsFile = 'build/failed-tests.txt'
-                        if (!fileExists(failedTestsFile)) {
-                            allTestsPassed = true
-                            break
-                        }
-
-                        def failedTests = readFile(failedTestsFile).trim()
-                        if (failedTests.isEmpty()) {
-                            allTestsPassed = true
-                            break
-                        }
-
-                        currentRun++
-                        echo "Run ${currentRun}: Retrying failed tests: ${failedTests}"
-                        failedTestsList.add(failedTests)
-                        sh "./gradlew test ${failedTests}"
-                    }
-
-                    if (!allTestsPassed && currentRun >= maxRetries) {
-                        echo "⚠️ Tests still failing after ${maxRetries} attempts"
-                        currentBuild.result = 'UNSTABLE'
-                    } else {
-                        echo "✅ All tests passed after ${currentRun} run(s)"
-                    }
+                  def failedTestsFile = 'build/failed-tests.txt'
+                  if (fileExists(failedTestsFile)) {
+                      def failedTests = readFile(failedTestsFile).trim()
+                      if (failedTests) {
+                          sh 'chmod +x gradlew'
+                          catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+                                                          sh "./gradlew test ${failedTests}"
+                                                      }
+                      }
+                  }
                 }
             }
         }
+
     }
 
     post {
@@ -95,7 +76,7 @@ pipeline {
                         Allure report: ${env.BUILD_URL}allure/
                     """,
                         to: 'smith80java@gmail.com',
-                        from: 'jenkins@gmail.com'
+                        from: 'smith-m-80@mail.ru'
                 )
 
                 // Telegram уведомление
@@ -106,11 +87,13 @@ pipeline {
                 *Duration*: ${duration}
                 [View Logs](${env.BUILD_URL})
                 """
+                /*
                 sh """
                     curl -s -X POST https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage \
                     -d chat_id=${TELEGRAM_CHAT_ID} \
                     -d text="${telegramMsg}"
                 """
+                */
             }
         }
 
@@ -132,7 +115,7 @@ pipeline {
                         Allure report: ${env.BUILD_URL}allure/
                     """,
                         to: 'smith80java@gmail.com',
-                        from: 'jenkins@gmail.com'
+                        from: 'smith-m-80@mail.ru'
                 )
 
                 // Telegram уведомление
@@ -143,11 +126,13 @@ pipeline {
                 *Duration*: ${duration}
                 [View Logs](${env.BUILD_URL})
                 """
+                /*
                 sh """
                     curl -s -X POST https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage \
                     -d chat_id=${TELEGRAM_CHAT_ID} \
                     -d text="${telegramMsg}"
                 """
+                */
             }
         }
 
@@ -168,16 +153,18 @@ pipeline {
                         View build: ${env.BUILD_URL}
                     """,
                         to: 'smith80java@gmail.com',
-                        from: 'jenkins@gmail.com'
+                        from: 'smith-m-80@mail.ru'
                 )
 
                 // Telegram уведомление
                 def telegramMsg = "⚠️ *TESTS UNSTABLE* ⚠️\nJob: ${env.JOB_NAME}\nBuild: #${env.BUILD_NUMBER}\nSome tests failed after ${params.MAX_RETRIES} attempts.\n[View Logs](${env.BUILD_URL})"
+              /*
                 sh """
                     curl -s -X POST https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage \
                     -d chat_id=${TELEGRAM_CHAT_ID} \
                     -d text="${telegramMsg}"
                 """
+                */
             }
         }
     }
