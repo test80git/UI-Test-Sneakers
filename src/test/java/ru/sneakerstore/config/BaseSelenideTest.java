@@ -50,7 +50,8 @@ abstract public class BaseSelenideTest {
     }
 
     private void setUp() {
-        WebDriverManager.chromedriver().setup();
+        // WebDriverManager.chromedriver().setup(); // Закомментировано для CI
+        System.setProperty("webdriver.chrome.driver", "/usr/local/bin/chromedriver");
         Configuration.fastSetValue = false; // Использовать реальный ввод (не JS)
     }
 
