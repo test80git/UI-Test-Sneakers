@@ -68,8 +68,9 @@ pipeline {
                  // Объединяем результаты из всех запусков
                                 sh '''
                                     mkdir -p build/allure-results-final
-                                    cp -r build/allure-results-1/* build/allure-results-final/ 2>/dev/null || true
-                                    cp -r build/allure-results-2/* build/allure-results-final/ 2>/dev/null || true
+                                        cp -rv build/allure-results-1/* build/allure-results-final/ || echo "No files in allure-results-1"
+                                        cp -rv build/allure-results-2/* build/allure-results-final/ || echo "No files in allure-results-2"
+                                        ls -la build/allure-results-final/
                                 '''
                     allure includeProperties: false, results: [[path: 'build/allure-results-final']]
                 }
