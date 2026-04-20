@@ -25,7 +25,7 @@ pipeline {
                 script {
                     sh 'chmod +x gradlew'
                     catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-                        sh './gradlew clean test -Drun.id=1'
+                        sh '/opt/gradle/bin/gradle clean test -Drun.id=1'
                     }
                 }
             }
@@ -40,7 +40,7 @@ pipeline {
                         if (failedTests) {
                             sh 'chmod +x gradlew'
                             catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-                                sh "./gradlew test ${failedTests} -Drun.id=2"
+                                sh "/opt/gradle/bin/gradle test ${failedTests} -Drun.id=2"
                             }
                         }
                     }
